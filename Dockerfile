@@ -1,13 +1,13 @@
-FROM node:alpine as builder
-
+FROM node:alpine
 WORKDIR '/app'
-
-COPY package.json .
+COPY package*.json ./
 RUN npm install
 COPY . .
 RUN npm run build
 
 FROM nginx
-# For ElasticBeanstalk
+# ElasticBeanstalk only port expose
 EXPOSE 80
-COPY --from=builder /app/build /usr/share/nginx/html
+
+# From '0' is the previous 'FROM' build. Can't use FROM node:alpine as NAMED
+COPY --from=0 /app/build /usr/share/nginx/html
